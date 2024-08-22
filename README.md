@@ -75,13 +75,3 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
 
-
-## 关键
-
-- Outside-in TDD 如何实践
-- 单元测试写哪些? 怎么写?
-
-
-注意事项:
-
-1.这里并没有直接对api client做单元测试, 而是利用store, api做集成测试. 理由: 1. api属于无法掌控的外部依赖, 难以保持测试用例与这样的依赖同步; 2. 假如对api进行测试, 难免会stub axios, axios.create这样的对象/函数, 相当于测试了axios的代码, 没有这个必要. 
