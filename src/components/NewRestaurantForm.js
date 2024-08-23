@@ -5,9 +5,10 @@ import { connect } from "react-redux";
 import { createRestaurant } from "../store/restaurants/actions";
 
 export function NewRestaurantForm({ createRestaurant }) {
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    createRestaurant(name);
+    await createRestaurant(name);
+    setName("");
   };
 
   const [name, setName] = useState("");
