@@ -6,8 +6,11 @@ describe("NewRestaurantForm", () => {
   const restaurantName = "Sushi Place";
   let createRestaurant;
   const requiredError = "Name is required";
+  const serverError = "The restaurant could not be saved. Please try again.";
+  let user;
 
   function renderComponent() {
+    user = userEvent.setup();
     createRestaurant = jest.fn().mockName("createRestaurant");
     render(<NewRestaurantForm createRestaurant={createRestaurant} />);
   }
@@ -17,6 +20,11 @@ describe("NewRestaurantForm", () => {
       renderComponent();
 
       expect(screen.queryByText(requiredError)).not.toBeInTheDocument();
+    });
+
+    it("does not display a server error", () => {
+      renderComponent();
+      expect(screen.queryByText(serverError)).not.toBeInTheDocument();
     });
   });
 
@@ -83,23 +91,57 @@ describe("NewRestaurantForm", () => {
         restaurantName
       );
       await userEvent.click(screen.getByText("Add"));
-
-      // renderComponent();
-      // createRestaurant.mockResolvedValue();
-
-      // userEvent.click(screen.getByText("Add"));
-
-      // await userEvent.type(
-      //   screen.getByPlaceholderText("Add Restaurant"),
-      //   restaurantName
-      // );
-      // userEvent.click(screen.getByText("Add"));
     }
 
     it("clears the validation error", async () => {
       await fixValidationError();
-      // expect(screen.queryByText("Name is required")).not.toBeInTheDocument();
       expect(screen.queryByText(requiredError)).not.toBeInTheDocument();
+    });
+  });
+
+  describe("when the store action rejects", () => {
+    async function fillInForm() {
+      renderComponent();
+      createRestaurant.mockRejectedValue();
+
+      await user.type(
+        screen.getByPlaceholderText("Add Restaurant"),
+        restaurantName
+      );
+      await user.click(screen.getByText("Add"));
+    }
+
+    it("displays a server error", async () => {
+      await fillInForm();
+      expect(screen.getByText(serverError)).toBeInTheDocument();
+    });
+
+    it("does not clear the name", async () => {
+      await fillInForm();
+      expect(screen.getByPlaceholderText("Add Restaurant").value).toEqual(
+        restaurantName
+      );
+    });
+  });
+
+  describe("when retrying after a server error", () => {
+    async function retrySubmittingForm() {
+      renderComponent();
+      createRestaurant.mockRejectedValueOnce().mockResolvedValueOnce();
+
+      await user.type(
+        screen.getByPlaceholderText("Add Restaurant"),
+        restaurantName
+      );
+
+      await user.click(screen.getByText("Add"));
+      await user.click(screen.getByText("Add"));
+    }
+
+    it("clears the server error", async () => {
+      await retrySubmittingForm();
+
+      expect(screen.queryByText(serverError)).not.toBeInTheDocument();
     });
   });
 });
