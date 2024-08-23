@@ -3,28 +3,39 @@ import Button from "@mui/material/Button";
 import { useState } from "react";
 import { connect } from "react-redux";
 import { createRestaurant } from "../store/restaurants/actions";
+import Alert from "@mui/material/Alert";
 
 export function NewRestaurantForm({ createRestaurant }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
-    await createRestaurant(name);
+    if (!name) {
+      setValidationError(true);
+    } else {
+      setValidationError(false);
+      await createRestaurant(name);
+    }
+
     setName("");
   };
 
   const [name, setName] = useState("");
+  const [validationError, setValidationError] = useState(false);
   return (
-    <form onSubmit={handleSubmit}>
-      <TextField
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Add Restaurant"
-        fullWidth
-        variant="filled"
-      />
-      <Button type="submit" variant="contained" color="primary">
-        Add
-      </Button>
-    </form>
+    <>
+      {validationError && <Alert severity="error">Name is required</Alert>}
+      <form onSubmit={handleSubmit}>
+        <TextField
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Add Restaurant"
+          fullWidth
+          variant="filled"
+        />
+        <Button type="submit" variant="contained" color="primary">
+          Add
+        </Button>
+      </form>
+    </>
   );
 }
 
