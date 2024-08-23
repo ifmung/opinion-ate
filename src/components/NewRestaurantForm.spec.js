@@ -18,7 +18,7 @@ describe("NewRestaurantForm", () => {
         screen.getByPlaceholderText("Add Restaurant"),
         restaurantName
       );
-      userEvent.click(screen.getByText("Add"));
+      await userEvent.click(screen.getByText("Add"));
     }
 
     it("calls createRestaurant with the name", async () => {
