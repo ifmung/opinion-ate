@@ -1,7 +1,7 @@
 import { createStore, applyMiddleware } from "redux";
 import thunk from "redux-thunk";
 import restaurantsReducer from "./restaurants/reducers";
-import { loadRestaurants } from "./restaurants/actions";
+import { loadRestaurants, createRestaurant } from "./restaurants/actions";
 
 describe("restaurants", () => {
   describe("initially", () => {
@@ -104,6 +104,48 @@ describe("restaurants", () => {
 
     it("clears the error flag", () => {
       expect(store.getState().loadError).toBe(false);
+    });
+  });
+
+  describe("createRestaurant action", () => {
+    const newRestaurantName = "Sushi Place";
+    let api;
+    let store;
+
+    const existingRestaurant = { id: 1, name: "Pizza Place" };
+    const responseRestaurant = { id: 2, name: newRestaurantName };
+
+    beforeEach(() => {
+      api = {
+        createRestaurant: jest.fn().mockName("createRestaurant"),
+      };
+      const initialState = {
+        records: [existingRestaurant],
+      };
+      store = createStore(
+        restaurantsReducer,
+        initialState,
+        applyMiddleware(thunk.withExtraArgument(api))
+      );
+    });
+
+    it("saves the restaurant to the server", () => {
+      store.dispatch(createRestaurant(newRestaurantName));
+      expect(api.createRestaurant).toHaveBeenCalledWith(newRestaurantName);
+    });
+
+    describe("when saving succeeds", () => {
+      beforeEach(() => {
+        api.createRestaurant.mockResolvedValue(responseRestaurant);
+        return store.dispatch(createRestaurant(newRestaurantName));
+      });
+
+      it("stores the returned restaurant in the store", () => {
+        expect(store.getState().records).toEqual([
+          existingRestaurant,
+          responseRestaurant,
+        ]);
+      });
     });
   });
 });
