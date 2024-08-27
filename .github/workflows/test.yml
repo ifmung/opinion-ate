@@ -19,11 +19,6 @@ jobs:
       - name: Unit Tests
         run: yarn test --watchAll=false
 
-      - name: Start Server
-        run: yarn start &
-      - name: Wait for Server to be Ready
-        run: npx wait-on http://localhost:3000
-
       - name: Run Playwright tests
         run: yarn playwright test
       - uses: actions/upload-artifact@v4
